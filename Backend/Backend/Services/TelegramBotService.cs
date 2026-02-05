@@ -29,19 +29,36 @@ namespace Backend.API.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _botClient.StartReceiving(
-                       updateHandler: HandleUpdateAsync,
-                       pollingErrorHandler: HandleErrorAsync,
-                       receiverOptions: new ReceiverOptions
-                       {
-                           AllowedUpdates = Array.Empty<UpdateType>(),
-                           ThrowPendingUpdates = true,
-                       },
-                       cancellationToken: _cts.Token
-                   );
+            try
+            {
+                // Инициализируем CancellationTokenSource
+                _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            var me = await _botClient.GetMeAsync(_cts.Token);
-            _logger.LogInformation($"Бот @{me.Username} успешно запущен!");
+                _logger.LogInformation("Получаем информацию о боте...");
+
+                // Получаем информацию о боте
+                var me = await _botClient.GetMeAsync();
+                _logger.LogInformation($"Бот @{me.Username} успешно запущен!");
+
+                // Начинаем получать обновления
+                _botClient.StartReceiving(
+                    updateHandler: HandleUpdateAsync,
+                    pollingErrorHandler: HandleErrorAsync,
+                    receiverOptions: new ReceiverOptions
+                    {
+                        AllowedUpdates = Array.Empty<UpdateType>(),
+                        ThrowPendingUpdates = true,
+                    },
+                    cancellationToken: _cts.Token
+                );
+
+                _logger.LogInformation("Бот начал получать обновления...");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при запуске бота");
+                throw;
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
