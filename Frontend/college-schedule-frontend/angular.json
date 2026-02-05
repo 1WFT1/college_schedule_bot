@@ -17,13 +17,13 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/college-schedule-frontend",  // ← ДОБАВЬТЕ ЭТО
+            "index": "src/index.html",  // ← ДОБАВЬТЕ ЭТО
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/favicon.ico",  // ← ИЗМЕНИТЕ ЭТО
+              "src/assets"         // ← ИЛИ ДОБАВЬТЕ ЭТО
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -44,12 +44,14 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/"  // ← ВАЖНО ДЛЯ VERCEL
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "baseHref": "/"
             }
           },
           "defaultConfiguration": "production"
